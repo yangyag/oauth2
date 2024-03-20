@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: yangyag-oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
