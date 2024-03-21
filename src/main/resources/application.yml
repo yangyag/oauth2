@@ -1,13 +1,3 @@
 spring:
-  application:
-    name: yangyag-oauth
-  security:
-    oauth2:
-      client:
-        registration:
-          google:
-            client-id:
-              client-secret:
-              scope:
-              client-authentication-method:
-              redirect-uri:
+  profiles:
+    active: local
