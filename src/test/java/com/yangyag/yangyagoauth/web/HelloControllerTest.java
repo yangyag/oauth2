@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 
@@ -22,6 +23,7 @@ class HelloControllerTest {
     private HelloService helloService;
 
     @Test
+    @WithMockUser
     void shouldDisplayTextOnConsole() throws Exception {
         mockMvc
                 .perform(get("/hello"))

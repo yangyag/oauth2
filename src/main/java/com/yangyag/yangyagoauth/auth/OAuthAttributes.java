@@ -1,5 +1,7 @@
 package com.yangyag.yangyagoauth.auth;
 
+import com.yangyag.yangyagoauth.domain.user.Role;
+import com.yangyag.yangyagoauth.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -54,6 +56,15 @@ public class OAuthAttributes {
                 .picture((String) response.get("profile_image"))
                 .attributes(response)
                 .nameAttributeKey(userNameAttributeName)
+                .build();
+    }
+
+    public User toEntity() {
+        return User.builder()
+                .name(name)
+                .email(email)
+                .picture(picture)
+                .role(Role.GUEST)
                 .build();
     }
 }
