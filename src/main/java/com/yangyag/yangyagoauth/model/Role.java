@@ -1,4 +1,4 @@
-package com.yangyag.yangyagoauth.domain.user;
+package com.yangyag.yangyagoauth.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,5 +1,6 @@
-package com.yangyag.yangyagoauth.service;
+package com.yangyag.yangyagoauth.auth;
 
+import com.yangyag.yangyagoauth.auth.TokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -15,16 +16,15 @@ import java.io.IOException;
 @Component
 public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-//    private final TokenProvider tokenProvider;
+    private final TokenProvider tokenProvider;
     private static final String URI = "/success";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException, ServletException {
         // accessToken, refreshToken 발급
-//        String accessToken = tokenProvider.generateAccessToken(authentication);
-//        tokenProvider.generateRefreshToken(authentication, accessToken);
-        String accessToken = "this is token";
+        String accessToken = tokenProvider.generateAccessToken(authentication);
+        tokenProvider.generateRefreshToken(authentication, accessToken);
 
         // 토큰 전달을 위한 redirect
         String redirectUrl = UriComponentsBuilder.fromUriString(URI)

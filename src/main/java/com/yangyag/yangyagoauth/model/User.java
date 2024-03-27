@@ -1,6 +1,5 @@
-package com.yangyag.yangyagoauth.domain.user;
+package com.yangyag.yangyagoauth.model;
 
-import com.yangyag.yangyagoauth.domain.BaseTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

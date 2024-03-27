@@ -1,7 +1,7 @@
 package com.yangyag.yangyagoauth.auth;
 
-import com.yangyag.yangyagoauth.domain.user.Role;
-import com.yangyag.yangyagoauth.domain.user.User;
+import com.yangyag.yangyagoauth.model.Role;
+import com.yangyag.yangyagoauth.model.User;
 import lombok.Builder;
 import lombok.Getter;
 

@@ -1,29 +1,22 @@
 package com.yangyag.yangyagoauth.config;
 
-import com.yangyag.yangyagoauth.service.OAuth2SuccessHandler;
+import com.yangyag.yangyagoauth.auth.TokenAuthenticationFilter;
+import com.yangyag.yangyagoauth.auth.TokenExceptionFilter;
+import com.yangyag.yangyagoauth.auth.OAuth2SuccessHandler;
 import com.yangyag.yangyagoauth.service.OAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
-
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
-import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Configuration
@@ -32,6 +25,7 @@ public class SecurityConfig {
 
     private final OAuthService oAuthService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
+    private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
@@ -61,12 +55,13 @@ public class SecurityConfig {
                                 PathRequest.toH2Console(),
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/hello"),
-                                new AntPathRequestMatcher("/success")
+                                new AntPathRequestMatcher("/success"),
+                                new AntPathRequestMatcher("/api.html")
                                 ).permitAll()
                 .anyRequest().authenticated()
                 )
 
-        // oauth2 설정
+                // oauth2 설정
                 .oauth2Login(
                         oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
                         // OAuth2 공급자로부터 사용자 정보를 가져오고, 이 정보를 기반으로 애플리케이션 내의
@@ -75,7 +70,11 @@ public class SecurityConfig {
                         // 로그인 성공 시 핸들러. 위 사용자 정보를 가지고 온 이후 실행됨.
                         // 위 두가지가 분리 된 이유는 단일책임원칙(SRP)에 의거함.
                         .successHandler(oAuth2SuccessHandler)
-        );
+
+                 )// jwt 관련 설정
+                .addFilterBefore(tokenAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass()); // 토큰 예외 핸들링;
 
         return http.build();
     }

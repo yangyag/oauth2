@@ -1,5 +1,6 @@
-package com.yangyag.yangyagoauth.domain.user;
+package com.yangyag.yangyagoauth.repository;
 
+import com.yangyag.yangyagoauth.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

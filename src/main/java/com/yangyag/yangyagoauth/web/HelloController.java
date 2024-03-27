@@ -6,6 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collections;
+
 @RestController
 @RequiredArgsConstructor
 public class HelloController {
@@ -20,12 +22,8 @@ public class HelloController {
     }
 
     @GetMapping("/bye")
-    public String bye() {
-        return "bye";
-    }
-
-    @GetMapping("/success")
-    public String loginSuccess() {
-        return "login success";
+    public ResponseEntity<?> bye() {
+        // "message": "bye" 형태의 JSON 응답을 생성
+        return ResponseEntity.ok(Collections.singletonMap("message", "bye"));
     }
 }

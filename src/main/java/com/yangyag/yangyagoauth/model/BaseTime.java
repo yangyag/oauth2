@@ -1,4 +1,4 @@
-package com.yangyag.yangyagoauth.domain;
+package com.yangyag.yangyagoauth.model;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;
