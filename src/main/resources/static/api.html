@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT with Fetch</title>
+</head>
+<body>
+<div>
+    <label for="jwtToken">JWT 토큰:</label>
+    <input type="text" id="jwtToken" placeholder="여기에 JWT 값을 입력하세요">
+</div>
+<div>
+    <label for="urlInput">URL:</label>
+    <input type="text" id="urlInput" placeholder="/path" value="bye">
+</div>
+<button onclick="sendRequest()">이동</button>
+<!-- 서버 응답을 표시할 요소 추가 -->
+<div id="responseOutput" style="margin-top: 20px; white-space: pre-wrap;"></div>
+
+<script>
+    function sendRequest() {
+      const jwtToken = document.getElementById('jwtToken').value;
+      const url = document.getElementById('urlInput').value;
+
+      fetch('/' + url, {
+        method: 'GET',
+        headers: {
+          'Authorization': 'Bearer ' + jwtToken,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+        document.getElementById('responseOutput').textContent = JSON.stringify(data, null, 2);
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+        document.getElementById('responseOutput').textContent = '오류: ' + error.message;
+      });
+    }
+</script>
+</body>
+</html>

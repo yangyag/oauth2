@@ -1,13 +1,9 @@
 package com.yangyag.yangyagoauth.service;
 
 import com.yangyag.yangyagoauth.auth.OAuthAttributes;
-import com.yangyag.yangyagoauth.auth.SessionUser;
-import com.yangyag.yangyagoauth.domain.user.User;
-import com.yangyag.yangyagoauth.domain.user.UserRepository;
-import jakarta.servlet.http.HttpSession;
+import com.yangyag.yangyagoauth.model.User;
+import com.yangyag.yangyagoauth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -17,16 +13,13 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
     private final UserRepository userRepository;
-    private final HttpSession httpSession;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -41,7 +34,6 @@ public class OAuthService implements OAuth2UserService<OAuth2UserRequest, OAuth2
         // OAuth2UserService
         OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
         User user = saveOrUpdate(attributes);
-        httpSession.setAttribute("user", new SessionUser(user)); // SessionUser (직렬화된 dto 클래스 사용)
 
         return new DefaultOAuth2User(Collections.singleton(new SimpleGrantedAuthority(user.getRoleKey())),
                 attributes.getAttributes(),
