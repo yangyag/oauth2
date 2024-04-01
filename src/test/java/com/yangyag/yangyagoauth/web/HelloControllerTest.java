@@ -1,5 +1,6 @@
 package com.yangyag.yangyagoauth.web;
 
+import com.yangyag.yangyagoauth.auth.TokenProvider;
 import com.yangyag.yangyagoauth.service.HelloService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ class HelloControllerTest {
 
     @MockBean
     private HelloService helloService;
+
+    @MockBean
+    private TokenProvider tokenProvider;
 
     @Test
     @WithMockUser

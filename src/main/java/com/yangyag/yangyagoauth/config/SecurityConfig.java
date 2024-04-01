@@ -56,8 +56,13 @@ public class SecurityConfig {
                                 new AntPathRequestMatcher("/"),
                                 new AntPathRequestMatcher("/hello"),
                                 new AntPathRequestMatcher("/success"),
+                                new AntPathRequestMatcher("/api.html"),
+                                new AntPathRequestMatcher("/api/messages/redis"),
+                                new AntPathRequestMatcher("/api/messages/kafka")
+                        ).permitAll()
                                 new AntPathRequestMatcher("/api.html")
                                 ).permitAll()
+
                 .anyRequest().authenticated()
                 )
 
