@@ -5,14 +5,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-@Service("redisPublisher")
+@Service("redis")
 @RequiredArgsConstructor
 public class RedisPublisher implements MessagePublisher {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
     @Override
-    public void publish(String topic, String message) {
+    public void sendMessage(String topic, String message) {
         redisTemplate.convertAndSend(topic, message);
     }
 }

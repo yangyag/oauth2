@@ -1,33 +1,22 @@
 package com.yangyag.yangyagoauth.web;
 
-import com.yangyag.yangyagoauth.service.impl.KafkaProducer;
 import com.yangyag.yangyagoauth.service.MessagePublisher;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
 public class MessageController {
 
-    @Qualifier("kafkaProducer")
-    private final MessagePublisher kafkaProducer;
+    private final Map<String, MessagePublisher> messagePublisher;
 
-    @Qualifier("redisPublisher")
-    private final MessagePublisher redisPublisher;
+    @PostMapping("/{messagingSystem}")
+    public String sendMessage(@PathVariable String messagingSystem, @RequestParam String topic, @RequestParam String message) {
+        messagePublisher.get(messagingSystem).sendMessage(topic, message);
 
-    @PostMapping("/kafka")
-    public String sendMessage(@RequestParam String topic, @RequestBody String message) {
-        kafkaProducer.publish(topic, message);
-
-        return "Message produced";
-    }
-
-    @PostMapping("/redis")
-    public String publicMessage(@RequestParam String topic, @RequestParam String message) {
-        redisPublisher.publish(topic, message);
-
-        return "Message published";
+        return "Message has been sent successful";
     }
 }
