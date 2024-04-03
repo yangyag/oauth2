@@ -28,55 +28,50 @@ public class SecurityConfig {
     private final TokenAuthenticationFilter tokenAuthenticationFilter;
 
     @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() { // security를 적용하지 않을 리소스
+    public WebSecurityCustomizer webSecurityCustomizer() { // 보안 설정에서 제외할 리소스 설정
         return web -> web.ignoring()
-                // error endpoint를 열어줘야 함, favicon.ico 추가!
-                .requestMatchers("/error", "/favicon.ico");
+                .requestMatchers("/error", "/favicon.ico"); // /error, /favicon.ico 엔드포인트는 보안 설정에서 제외
     }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // rest api 설정
-                .csrf(AbstractHttpConfigurer::disable) // csrf 비활성화 -> cookie를 사용하지 않으면 꺼도 된다. (cookie를 사용할 경우 httpOnly(XSS 방어), sameSite(CSRF 방어)로 방어해야 한다.)
-                .cors(AbstractHttpConfigurer::disable) // cors 비활성화 -> 프론트와 연결 시 따로 설정 필요
-                .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 비활성화
-                .formLogin(AbstractHttpConfigurer::disable) // 기본 login form 비활성화
-                .logout(AbstractHttpConfigurer::disable) // 기본 logout 비활성화
+                // REST API 설정
+                .csrf(AbstractHttpConfigurer::disable) // CSRF 공격 방지 기능 비활성화 (stateless한 서비스에서는 필요 없음)
+                .cors(AbstractHttpConfigurer::disable) // CORS 설정 비활성화 (프론트엔드와 연결할 때 별도로 설정 필요)
+                .httpBasic(AbstractHttpConfigurer::disable) // 기본 인증 로그인 방식 비활성화
+                .formLogin(AbstractHttpConfigurer::disable) // 기본 폼 로그인 방식 비활성화
+                .logout(AbstractHttpConfigurer::disable) // 기본 로그아웃 방식 비활성화
                 .headers(header -> header
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)
-                ) // X-Frame-Options 비활성화
+                ) // X-Frame-Options 헤더 설정 (동일 출처에서만 프레임 렌더링 허용)
                 .sessionManagement(c ->
-                        c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용하지 않음
+                        c.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 사용 안 함 (stateless)
 
-                // request 인증, 인가 설정
+                // 요청에 대한 인증 및 권한 설정
                 .authorizeHttpRequests(request ->
                         request.requestMatchers(
-                                PathRequest.toH2Console(),
-                                new AntPathRequestMatcher("/"),
-                                new AntPathRequestMatcher("/hello"),
-                                new AntPathRequestMatcher("/success"),
-                                new AntPathRequestMatcher("/api.html"),
-                                new AntPathRequestMatcher("/api/messages/redis"),
-                                new AntPathRequestMatcher("/api/messages/kafka")
-                        ).permitAll()
-                .anyRequest().authenticated()
+                                        PathRequest.toH2Console(), // H2 콘솔 접근 허용
+                                        new AntPathRequestMatcher("/"), // 루트 경로 접근 허용
+                                        new AntPathRequestMatcher("/hello"), // /hello 엔드포인트 접근 허용
+                                        new AntPathRequestMatcher("/success"), // /success 엔드포인트 접근 허용
+                                        new AntPathRequestMatcher("/api.html"), // /api.html 엔드포인트 접근 허용
+                                        new AntPathRequestMatcher("/api/messages/redis"), // /api/messages/redis 엔드포인트 접근 허용
+                                        new AntPathRequestMatcher("/api/messages/kafka") // /api/messages/kafka 엔드포인트 접근 허용
+                                ).permitAll()
+                                .anyRequest().authenticated() // 그 외의 요청은 인증 필요
                 )
 
-                // oauth2 설정
+                // OAuth2 인증 설정
                 .oauth2Login(
-                        oauth -> // OAuth2 로그인 기능에 대한 여러 설정의 진입점
-                        // OAuth2 공급자로부터 사용자 정보를 가져오고, 이 정보를 기반으로 애플리케이션 내의
-                        // 사용자 인스턴스를 생성하거나 업데이트하는 역할
-                        oauth.userInfoEndpoint(c -> c.userService(oAuthService))
-                        // 로그인 성공 시 핸들러. 위 사용자 정보를 가지고 온 이후 실행됨.
-                        // 위 두가지가 분리 된 이유는 단일책임원칙(SRP)에 의거함.
-                        .successHandler(oAuth2SuccessHandler)
+                        oauth ->
+                                oauth.userInfoEndpoint(c -> c.userService(oAuthService)) // OAuth2 공급자로부터 사용자 정보를 가져와 애플리케이션 내 사용자 생성/업데이트
+                                        .successHandler(oAuth2SuccessHandler) // OAuth2 인증 성공 후 처리 핸들러 설정
+                )
 
-                 )// jwt 관련 설정
-                .addFilterBefore(tokenAuthenticationFilter,
-                        UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass()); // 토큰 예외 핸들링;
+                // JWT 인증 필터 설정
+                .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class) // JWT 인증 필터 추가
+                .addFilterBefore(new TokenExceptionFilter(), tokenAuthenticationFilter.getClass()); // JWT 예외 처리 필터 추가
 
         return http.build();
     }
