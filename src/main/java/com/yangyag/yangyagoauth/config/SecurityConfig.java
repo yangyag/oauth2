@@ -57,7 +57,8 @@ public class SecurityConfig {
                                         new AntPathRequestMatcher("/success"), // /success 엔드포인트 접근 허용
                                         new AntPathRequestMatcher("/api.html"), // /api.html 엔드포인트 접근 허용
                                         new AntPathRequestMatcher("/api/messages/redis"), // /api/messages/redis 엔드포인트 접근 허용
-                                        new AntPathRequestMatcher("/api/messages/kafka") // /api/messages/kafka 엔드포인트 접근 허용
+                                        new AntPathRequestMatcher("/api/messages/kafka"), // /api/messages/kafka 엔드포인트 접근 허용
+                                        new AntPathRequestMatcher("/calculate")
                                 ).permitAll()
                                 .anyRequest().authenticated() // 그 외의 요청은 인증 필요
                 )
